@@ -1,0 +1,75 @@
+@startuml database_design
+' 用户实体
+entity "User" {
+    user_id : int
+    username : varchar
+    password : varchar
+    email : varchar
+    personal_info : json
+}
+' 分类实体
+entity "Category" {
+    category_id : int
+    category_name : varchar
+    description : text
+    sort_weight : int
+}
+' 主题实体
+entity "Topic" {
+    topic_id : int
+    user_id : int <<[FK]>>
+    category_id : int <<[FK]>>
+    title : varchar
+    content : text
+    post_time : datetime
+    last_reply_time : datetime
+    reply_count : int
+    view_count : int
+}
+' 回复实体
+entity "Post" {
+    post_id : int
+    topic_id : int <<[FK]>>
+    user_id : int <<[FK]>>
+    content : text
+    post_time : datetime
+    best_reply : bool
+}
+' 标签实体
+entity "Tag" {
+    tag_id : int
+    tag_name : varchar
+}
+' 用户标签关联实体
+entity "User_Tag" {
+    user_id : int <<[FK]>>
+    tag_id : int <<[FK]>>
+}
+' 通知实体
+entity "Notification" {
+    notification_id : int
+    user_id : int <<[FK]>>
+    type : varchar
+    target_id : int <<[FK]>>
+    status : varchar
+}
+' 搜索历史实体
+entity "Search_History" {
+    history_id : int
+    user_id : int <<[FK]>>
+    search_keyword : varchar
+    search_time : datetime
+}
+
+' 关系
+User --o{ Topic : posts >
+Topic --o{ Post : has_posts >
+Post -left-|> User : user >
+Post -left-|> Topic : belongs_to_topic >
+Category --o{ Topic : has_topics >
+User --o{ User_Tag : has_tags >
+User_Tag -left-|> Tag : tagged >
+'Notification -left-|> User : user >
+'Notification -left-|> Topic || Post : notified >
+
+@enduml

@@ -1,7 +1,6 @@
 import secrets
 from pydantic_settings import BaseSettings
 
-
 class Settings(BaseSettings):
     API_V1_STR: str = "/api/v1"
     # 60 minutes * 24 hours * 8 days = 8 days

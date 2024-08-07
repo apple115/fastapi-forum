@@ -1,12 +1,31 @@
 from typing import Any
 
 from sqlmodel import Session, select
-from app.models import User
+from app.models import User,UserPublic,UserCreate
 from app.core.security import verifty_password
+from app.core.security import get_password_hash
 
 
 # def create_users()->User:
 #     pass
+
+
+def create_user(*, session: Session, user_create:UserCreate) -> User:
+    """
+    创建新用户并将其添加到数据库。
+
+    参数:
+        session (Session): SQLAlchemy 会话对象。
+       user_in (UserCreate): 包含新用户信息的 UserCreate 模型。
+
+    返回:
+        User: 新创建的用户对象。
+    """
+    db_obj = User.model_validate(user_create,update={"password_hash":get_password_hash(user_create.password)})
+    session.add(db_obj)
+    session.commit()
+    session.refresh(db_obj)
+    return db_obj
 
 
 def get_user_by_name(*, session: Session, name: str) -> User | None:

@@ -1,30 +1,39 @@
 from collections.abc import Generator
 from typing import Annotated
 
-
-from fastapi import Depends,HTTPException,status
+from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
-from jose import JWTError,jwt
+from jose import JWTError, jwt
 from pydantic import ValidationError
 from sqlmodel import Session
 
 from app.core import security
 from app.core.db import engine
 from app.core.config import settings
-from app.models import User,TokenPayload
+from app.models import User, TokenPayload
+import redis
 
-reusable_oauth2=OAuth2PasswordBearer(
-    tokenUrl=f'{settings.API_V1_STR}/login/access-token'
+reusable_oauth2 = OAuth2PasswordBearer(
+    tokenUrl=f"{settings.API_V1_STR}/login/access-token"
 )
 
-def get_db()->Generator[Session,None,None]:
+redis_client = redis.Redis(
+    host=settings.REDIS_HOST, port=settings.REDIS_PORT, db=settings.REDIS_DB
+)
+
+def get_redis() -> redis.Redis:
+    return redis_client
+
+
+def get_db() -> Generator[Session, None, None]:
     with Session(engine) as session:
         yield session
 
+RedisDep = Annotated[redis.Redis, Depends(get_redis)]
 SessionDep = Annotated[Session, Depends(get_db)]
 TokenDep = Annotated[str, Depends(reusable_oauth2)]
 
-def get_current_user(session:SessionDep,token:TokenDep)->User:
+def get_current_user(session: SessionDep, token: TokenDep) -> User:
     try:
         payload = jwt.decode(
             token, settings.SECRET_KEY, algorithms=[security.ALGORITHM]
@@ -41,4 +50,4 @@ def get_current_user(session:SessionDep,token:TokenDep)->User:
     return user
 
 
-CurrentUser = Annotated[User,Depends(get_current_user)]
+CurrentUser = Annotated[User, Depends(get_current_user)]

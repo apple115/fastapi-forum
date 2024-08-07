@@ -1,1 +1,3 @@
 .direnv
+./backend/app/core/config
+__pycache__/

@@ -1,5 +1,6 @@
 from datetime import datetime
 from sqlmodel import Field, SQLModel
+import uuid
 
 class Topic(SQLModel, table=True):
     """
@@ -9,8 +10,8 @@ class Topic(SQLModel, table=True):
     """
     __tablename__:str = "Topics"
     __table_args__ = {'extend_existing':True}
-    topic_id: int = Field(primary_key=True)
+    id: int = Field(primary_key=True)
     time: datetime = Field(default=datetime.now)
     title: str
     description: str
-    creator_id: int = Field(foreign_key="Users.user_id")
+    creator_id: uuid.UUID = Field(foreign_key="Users.id")

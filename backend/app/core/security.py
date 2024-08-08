@@ -4,6 +4,11 @@ from jose import jwt
 from passlib.context import CryptContext
 from app.core.config import settings
 
+import logging
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 ALGORITHM = "HS256"
 
@@ -40,4 +45,5 @@ def create_access_token(subject: str | Any, expires_delta: timedelta) -> str:
     # settings.SECRET_KEY 是用于编码的密钥
     # algorithm 是指定的散列算法
     encoded_jwt = jwt.encode(to_encode, settings.SECRET_KEY, algorithm=ALGORITHM)
+#    logger.info(f"生成的JWT令牌: {encoded_jwt}")
     return encoded_jwt

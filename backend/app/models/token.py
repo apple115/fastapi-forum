@@ -5,4 +5,4 @@ class Token(SQLModel):
     token_type: str = "bearer"
 
 class TokenPayload(SQLModel):
-    sub: int | None = None
+    sub: str | None = None

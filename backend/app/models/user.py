@@ -14,11 +14,16 @@ class UserBase(SQLModel):
         - level: 2 表示 普通论坛人员。
     """
     email: str
-    name:  str =Field(max_length=255)
+    name:  str|None =Field(default=None,max_length=255)
     level: int=Field(default=2)
 
 class UserCreate(UserBase):
     password:str =Field(max_length=255)
+
+class UserUpdate(SQLModel):
+    email:str|None = Field(default=None,max_length=255)
+    password:str|None = Field(default=None,max_length=255)
+    level:int|None = Field(default=2)
 
 class User(UserBase, table=True):
     """

@@ -28,10 +28,10 @@ def login_access_token(
     - Token: 包含访问令牌和过期信息的响应模型。
 
     发生错误时:
-    - 如果提供的用户名或密码不正确，将抛出一个状态码为401的Unauthorized HTTP异常。
+    - 如果提供的邮箱和密码不正确，将抛出一个状态码为401的Unauthorized HTTP异常。
     """
     user =user_crud.authenticate(
-        session=session, name=form_data.username, password=form_data.password
+        session=session, email=form_data.username, password=form_data.password
     )
     if not user:
         raise HTTPException(status_code=401, detail="Incorrect email or password")
@@ -41,3 +41,5 @@ def login_access_token(
             user.id, expires_delta=access_token_expires
         )
     )
+
+

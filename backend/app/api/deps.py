@@ -1,6 +1,5 @@
 from collections.abc import Generator
 from typing import Annotated
-
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
@@ -55,5 +54,26 @@ def get_current_user(session: SessionDep, token: TokenDep) -> User:
         raise HTTPException(status_code=404, detail="User not found")
     return user
 
+def get_current_admin(session:SessionDep,token:TokenDep)->User:
+    try:
+        payload = jwt.decode(
+            token, settings.SECRET_KEY, algorithms=[security.ALGORITHM]
+        )
+        token_data = TokenPayload(**payload)
+    except (JWTError, ValidationError) as e:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail=str(e),
+        )
+    if token_data.level == 2:
+        raise HTTPException(
+            status_code=401,
+            detail="not is admin"
+        )
+    user = session.get(User, token_data.sub)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    return user
 
 CurrentUser = Annotated[User, Depends(get_current_user)]
+CurrentAdmin = Annotated[User,Depends(get_current_admin)]

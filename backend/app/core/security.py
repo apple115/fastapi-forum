@@ -21,13 +21,14 @@ def verifty_password(plain_password:str,hashed_password:str)->bool:
 def get_password_hash(password:str)->str:
     return pwd_context.hash(password)
 
-def create_access_token(subject: str | Any, expires_delta: timedelta) -> str:
+def create_access_token(subject: str | Any, expires_delta: timedelta,level:int) -> str:
     """
     创建一个带有过期时间的访问令牌（JWT）。
 
     参数:
     - subject (str | Any): 令牌的主题，通常是用户的唯一标识符。
     - expires_delta (timedelta): 一个timedelta对象，表示令牌的有效期。
+    - level (int): 用户的权限等级 0 root 1 管理员 2 普通用户
 
     返回:
     - str: 编码后的JWT令牌。
@@ -38,6 +39,7 @@ def create_access_token(subject: str | Any, expires_delta: timedelta) -> str:
     to_encode = {
         "exp": expire,
         "sub": str(subject),
+        "level":level,
     }
 
     # 使用jwt库的encode方法编码JWT

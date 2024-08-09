@@ -32,14 +32,13 @@ def login_access_token(
     """
     user =user_crud.authenticate(
         session=session, email=form_data.username, password=form_data.password
+
     )
     if not user:
         raise HTTPException(status_code=401, detail="Incorrect email or password")
     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     return Token(
         access_token=security.create_access_token(
-            user.id, expires_delta=access_token_expires
+            user.id, expires_delta=access_token_expires,level=user.level
         )
     )
-
-

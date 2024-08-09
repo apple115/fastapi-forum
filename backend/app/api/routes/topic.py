@@ -4,7 +4,7 @@ from app.api.deps import SessionDep
 from app.models.topic import TopicCreate, TopicInput,Topic
 from app.models.user import UserPublic
 from app.crud import topic_crud
-from app.api.deps import CurrentUser
+from app.api.deps import CurrentUser,CurrentAdmin
 from typing import Any
 
 router = APIRouter()
@@ -88,7 +88,7 @@ def get_topic(session:SessionDep,topic_id:int):
         raise HTTPException(status_code=500,detail=str(e))
 
 @router.delete("/topics/{topic_id}")
-def delete_topic(session:SessionDep,topic_id:int,current_user: CurrentUser):
+def delete_topic(session:SessionDep,topic_id:int,current_admin:CurrentAdmin):
     try:
         pass
     except Exception as e:

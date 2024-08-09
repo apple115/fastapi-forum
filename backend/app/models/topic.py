@@ -13,6 +13,11 @@ class TopicInput(SQLModel):
     title:str
     description: str
 
+class TopicPublic(TopicBase):
+    id: int
+    time: datetime
+    creator_id: uuid.UUID
+
 class TopicUpdate(SQLModel):
     title:str|None = Field(default=None,max_length=100)
     description:str|None = Field(default=None,max_length=1000)

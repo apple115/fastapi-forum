@@ -10,6 +10,7 @@ from app.core import security
 from app.core.db import engine
 from app.core.config import settings
 from app.models import User, TokenPayload
+import uuid
 import redis
 import logging
 
@@ -49,7 +50,7 @@ def get_current_user(session: SessionDep, token: TokenDep) -> User:
             status_code=status.HTTP_403_FORBIDDEN,
             detail=str(e),
         )
-    user = session.get(User, token_data.sub)
+    user = session.get(User,uuid.UUID(token_data.sub))
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     return user
@@ -70,7 +71,7 @@ def get_current_admin(session:SessionDep,token:TokenDep)->User:
             status_code=401,
             detail="not is admin"
         )
-    user = session.get(User, token_data.sub)
+    user = session.get(User, uuid.UUID(token_data.sub))
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     return user

@@ -89,21 +89,21 @@ def get_topic(session:SessionDep,topic_id:int):
     except Exception as e:
         raise HTTPException(status_code=500,detail=str(e))
 
-@router.delete("/topics/{topic_id}")
+@router.delete("/topics/{topic_id}",include_in_schema=False)
 def delete_topic(session:SessionDep,topic_id:int,current_admin:CurrentAdmin):
     try:
         pass
     except Exception as e:
         raise HTTPException(status_code=500,detail=str(e))
 
-@router.put("/topics/{topic_id}")
+@router.put("/topics/{topic_id}",include_in_schema=False)
 def put_topic(session:SessionDep,topic_id:int,current_user: CurrentUser):
     try:
         pass
     except Exception as e:
         raise HTTPException(status_code=500,detail=str(e))
 
-@router.patch("topics/{topic_id}")
+@router.patch("topics/{topic_id}",include_in_schema=False)
 def patch_topic(session:SessionDep,topic_id:int,current_user: CurrentUser):
     try:
         pass

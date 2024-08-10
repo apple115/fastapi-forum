@@ -36,7 +36,7 @@ def create_post(session: SessionDep, topic_id: int, post_input: PostInput,Curren
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.get("/topics/{topic_id}/posts")
+@router.get("/topics/{topic_id}/posts",include_in_schema=False)
 def get_posts(session: SessionDep, topic_id: int):
     try:
         pass
@@ -44,15 +44,15 @@ def get_posts(session: SessionDep, topic_id: int):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.get("/topics/{topic_id}/posts/{post_id}")
-def get_post(session: SessionDep, topic_id: int, post_id: int):
+@router.get("/topics/{topic_id}/posts/{post_id}",include_in_schema=False)
+def get_post(session: SessionDep, topic_id: int, post_id: int,include_in_schema=False):
     try:
         pass
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.patch("/topics/{topic_id}/posts/{post_id}")
+@router.patch("/topics/{topic_id}/posts/{post_id}",include_in_schema=False)
 def patch_post(session: SessionDep, topic_id: int, post_id: int):
     try:
         pass
@@ -60,7 +60,7 @@ def patch_post(session: SessionDep, topic_id: int, post_id: int):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.get("/topics/{topic_id}/posts/{post_id}/likes")
+@router.get("/topics/{topic_id}/posts/{post_id}/likes",include_in_schema=False)
 def get_post_likes(session: SessionDep, topic_id: int, post_id: int):
     try:
         pass

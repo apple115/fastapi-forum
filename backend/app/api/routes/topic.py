@@ -6,6 +6,7 @@ from app.models.user import UserPublic
 from app.crud import topic_crud
 from app.api.deps import CurrentUser,CurrentAdmin
 from typing import Any
+import uuid
 
 router = APIRouter()
 '''
@@ -31,6 +32,7 @@ def  get_all_topic(session:SessionDep):
                 {"rel":"delete","href":f"/topics/{topic.id}","methed":"DELETE"},
                 {"rel":"put","href":f"/topics/{topic.id}","methed":"PUT"},
                 {"rel":"patch","href":f"/topics/{topic.id}","methed":"PATCH"},
+                {"rel":"get_users","href":f"/users/{topic.creator_id}","methed":"GET"}
             ]
             enriched_topic={
                 "id":topic.id,

@@ -2,6 +2,7 @@ from typing import Any
 from datetime import timedelta,datetime
 from jose import jwt
 from passlib.context import CryptContext
+import uuid
 from app.core.config import settings
 
 # import logging
@@ -38,7 +39,7 @@ def create_access_token(subject: str | Any, expires_delta: timedelta,level:int) 
 
     to_encode = {
         "exp": expire,
-        "sub": str(subject),
+        "sub":str(subject),
         "level":level,
     }
 

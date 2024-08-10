@@ -1,7 +1,8 @@
 from typing import Any
+import uuid
 
 from sqlmodel import Session, select
-from app.models.user import User, UserPublic, UserCreate, UserUpdate
+from app.models.user import User, UserPublic, UserCreate, UserUpdate,UserData
 from app.core.security import verifty_password
 from app.core.security import get_password_hash
 
@@ -29,6 +30,10 @@ def create_user(*, session: Session, user_create: UserCreate) -> User:
     session.refresh(db_obj)
     return db_obj
 
+def get_user_by_id(*,session:Session,id:uuid.UUID)->User|None:
+    statement = select(User).where(User.id == id)
+    session_user=session.exec(statement).first()
+    return session_user
 
 def get_user_by_name(*, session: Session, name: str) -> User | None:
     """

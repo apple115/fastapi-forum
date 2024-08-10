@@ -1,7 +1,5 @@
 from datetime import datetime
 from sqlmodel import Field, SQLModel
-from pydantic import EmailStr
-
 import uuid
 
 class UserBase(SQLModel):
@@ -33,7 +31,7 @@ class User(UserBase, table=True):
     Attributes:
         __tablename__ (str): 指定数据库中的表名。如果不设置，默认为类名的小写形式。
         __table_args__ (dict): 特殊表参数，这里设置'extend_existing': True，表示允许模型扩展已存在的表。
-        id (int | None): 用户的唯一标识符，设为主键（primary key），默认为None。
+        id
         created_at (datetime): 用户创建时间，使用Field指定默认值为当前时间。
         password_hash (str): 用户的密码哈希值，用于存储加密后的密码。
     """
@@ -45,9 +43,13 @@ class User(UserBase, table=True):
 
 class UserRegister(SQLModel):
     name:str=Field(max_length=255)
-    email:EmailStr = Field(max_length=255)
+    email:str = Field(max_length=255)
     password:str = Field(max_length=255)
     check_password:str=Field(max_length=255)
+
+class UserData(UserBase):
+    id:uuid.UUID
+    created_at:datetime
 
 class UserPublic(SQLModel):
     id:uuid.UUID

@@ -35,7 +35,6 @@ class User(UserBase, table=True):
         created_at (datetime): 用户创建时间，使用Field指定默认值为当前时间。
         password_hash (str): 用户的密码哈希值，用于存储加密后的密码。
     """
-    __tablename__:str = "Users"  # 可以指定表名，如果不指定，默认为类名的小写形式
     __table_args__ = {'extend_existing': True}  # 允许扩展已存在的表，而不是每次重新创建
     id:uuid.UUID = Field(default_factory=uuid.uuid4,primary_key=True)
     created_at: datetime = Field(default=datetime.now())
@@ -50,6 +49,3 @@ class UserRegister(SQLModel):
 class UserData(UserBase):
     id:uuid.UUID
     created_at:datetime
-
-class UserPublic(SQLModel):
-    id:uuid.UUID

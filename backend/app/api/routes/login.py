@@ -2,10 +2,9 @@ from typing import Annotated
 from datetime import timedelta
 
 from fastapi import APIRouter,Depends,HTTPException
-from fastapi.responses import HTMLResponse
 from fastapi.security import OAuth2PasswordRequestForm
 
-from app.models import Token
+from app.models.token import Token
 from app.core.config import settings
 from app.api.deps import SessionDep
 from app.crud import user_crud

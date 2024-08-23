@@ -9,7 +9,8 @@ from sqlmodel import Session
 from app.core import security
 from app.core.db import engine
 from app.core.config import settings
-from app.models import User, TokenPayload
+from app.models.token import TokenPayload
+from app.models.user import User
 import uuid
 import redis
 import logging

@@ -3,7 +3,7 @@ from app.core.config import settings
 
 def test_get_access_token(client:TestClient)->None:
     login_data  ={
-        "username":"yyc13066828611@163.com",
+        "username":"root@qq.com",
         "password":"123456",
     }
     r = client.post(f"{settings.API_V1_STR}/login/access-token", data=login_data)

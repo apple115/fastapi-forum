@@ -1,17 +1,20 @@
 import json
-from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks
-from app.models import UserRegister, UserCreate
-from app.core.security import get_password_hash
+from fastapi import APIRouter, HTTPException, BackgroundTasks
+from app.models.user import UserRegister, UserCreate
 from app.email_util import send_verification_email
 from app.crud.user_crud import create_user
-from app.api.deps import SessionDep,RedisDep
+from app.api.deps import SessionDep, RedisDep
 import uuid
 
 
 router = APIRouter()
 
 @router.post("/register")
-def register_user(userRegister: UserRegister, background_tasks: BackgroundTasks,redis_client:RedisDep):
+def register_user(
+    userRegister: UserRegister,
+    background_tasks: BackgroundTasks,
+    redis_client: RedisDep,
+):
     """
     验证两次密码是否一致
 
@@ -49,32 +52,32 @@ def register_user(userRegister: UserRegister, background_tasks: BackgroundTasks,
     return {"message": "Please check your email to verify your account."}
 
 
-async def get_registration_info_from_cache(token: str,redis_client:RedisDep):
+async def get_registration_info_from_cache(token: str, redis_client: RedisDep):
     registration_info_bytes = redis_client.get(f"register:{token}")
     if registration_info_bytes:
         # 将 bytes 类型解码为 utf-8 编码的字符串
-        registration_info_str = registration_info_bytes.decode("utf-8") #type: ignore
+        registration_info_str = registration_info_bytes.decode("utf-8")  # type: ignore
         # 将字符串解析为 JSON 对象
         return json.loads(registration_info_str)
     return None
 
 
 @router.get("/verify")
-async def verify_email(token: str, session: SessionDep,redis_client:RedisDep):
+async def verify_email(token: str, session: SessionDep, redis_client: RedisDep):
     """
-     1.    从缓存系统中获取注册信息和令牌：
-      从缓存系统中获取用户的注册信息和令牌。
+    1.    从缓存系统中获取注册信息和令牌：
+     从缓存系统中获取用户的注册信息和令牌。
 
-     2.   验证令牌：
-      验证用户提供的令牌是否有效。
+    2.   验证令牌：
+     验证用户提供的令牌是否有效。
 
-     3.  创建用户：
-      如果令牌有效，创建用户。
+    3.  创建用户：
+     如果令牌有效，创建用户。
 
-     4. 删除redis中的令牌：
+    4. 删除redis中的令牌：
     """
     # 从缓存系统中获取注册信息和令牌
-    registration_info = await get_registration_info_from_cache(token,redis_client)
+    registration_info = await get_registration_info_from_cache(token, redis_client)
     if not registration_info:
         raise HTTPException(status_code=404, detail="no token found")
 
@@ -84,7 +87,7 @@ async def verify_email(token: str, session: SessionDep,redis_client:RedisDep):
         password=registration_info["password"],
         name=registration_info["username"],
     )
-    create_user(session=session, user_create=user_in)
+    _=create_user(session=session, user_create=user_in)
     # 删除这个令牌
-    redis_client.delete(f'register:{token}')
+    _=redis_client.delete(f"register:{token}")
     return {"message": "User created successfully."}

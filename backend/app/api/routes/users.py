@@ -1,17 +1,19 @@
-from typing import Any
 import uuid
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, HTTPException
+from sqlmodel import SQLModel
 from app.api.deps import CurrentUser
-from app.models.user import UserPublic, UserData
+from app.models.user import  UserData
 from app.api.deps import SessionDep
 from app.crud import user_crud
 
 router = APIRouter()
 
+class UserPublic(SQLModel):
+    id:uuid.UUID
 
 @router.get("/me", response_model=UserPublic)
-def read_user_me(current_user: CurrentUser) -> Any:
+def read_user_me(current_user: CurrentUser):
     """
     Get current user.
     """
@@ -19,7 +21,7 @@ def read_user_me(current_user: CurrentUser) -> Any:
 
 
 @router.get("/users/{user_id}", response_model=UserData)
-def get_user_by_id(session: SessionDep, user_id: uuid.UUID) -> Any:
+def get_user_by_id(session: SessionDep, user_id: uuid.UUID):
     """
     Get a specific user by id.
     """

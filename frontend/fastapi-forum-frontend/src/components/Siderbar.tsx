@@ -5,7 +5,7 @@ interface SidebarProps {}
 
 const Sidebar: React.FC<SidebarProps> = () => {
   return (
-    <div className="bg-gray-800 text-white p-2 w-48 h-screen flex flex-col justify-between">
+    <div className="bg-white text-gray p-2 w-36 h-screen flex flex-col justify-evenly">
       <h2 className="text-xl font-bold mb-4">Forum Menu</h2>
       <ul>
         <li className="mb-2">

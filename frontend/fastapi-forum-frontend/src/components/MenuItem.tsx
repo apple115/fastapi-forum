@@ -9,9 +9,8 @@ interface MenuItemProps {
 
 const MenuItem: React.FC<MenuItemProps> = ({ title, address, Icon }) => {
   return (
-
     <Link href={address} className="hover:text-amber-500">
-      <p className="uppercase hidden sm:inline text-sm">{title}</p>
+      <p className="text-xs uppercase hidden sm:inline text-xs">{title}</p>
     </Link>
   );
 };

@@ -1,37 +1,33 @@
 import React from "react";
-interface Topic {
-  id: number;
-  title: string;
-  tags: string[];
+import TopicListItem from "./TopicListItem";
+
+interface TopicListProps {
+  topics: any[]
 }
 
-const TopicList: React.FC = () => {
-  // 假设这是一些模拟的主题数据
-  const topics: Topic[] = [
-    { id: 1, title: "Topic 1", tags: ["tag1", "tag2"] },
-    { id: 2, title: "Topic 2", tags: ["tag3", "tag4"] },
-    // 添加更多主题数据
-  ];
-
+const TopicList: React.FC<TopicListProps> = ({ topics }) => {
   return (
-    <div className="p-1">
-      {topics.map((topic) => (
-        <div key={topic.id} className="bg-white rounded p-4 mb-4 shadow">
-          <h3 className="text-lg font-bold">{topic.title}</h3>
-          <div className="flex flex-wrap">
-            {topic.tags.map((tag) => (
-              <span
-                key={tag}
-                className="bg-gray-200 rounded px-2 py-1 mr-2 mb-2"
-              >
-                {tag}
-              </span>
-            ))}
-          </div>
-        </div>
-      ))}
+    <div className="bg-white shadow-md rounded-lg p-6">
+      <h2 className="text-2xl font-bold mb-4">话题列表</h2>
+      <table className="table-auto w-full">
+        <thead className="bg-gray-200">
+          <tr>
+            <th className="px-4 py-2">话题</th>
+            <th className="px-4 py-2">回复</th>
+            <th className="px-4 py-2">浏览量</th>
+            <th className="px-4 py-2">活动</th>
+          </tr>
+        </thead>
+        <tbody>
+          {topics.map((topics)=>(
+            <TopicListItem topic={topics} key={topics.title} />
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 };
 
 export default TopicList;
+
+

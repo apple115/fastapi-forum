@@ -1,6 +1,5 @@
 import logging
-from sqlmodel import Session
-from app.core.db import engine, init_db,create_db_and_tables
+from app.core.db import init_db,create_db_and_tables
 
 
 logging.basicConfig(level=logging.INFO)
@@ -9,6 +8,7 @@ logger = logging.getLogger(__name__)
 
 def init() -> None:
     create_db_and_tables()
+    init_db()
 
 
 def main() -> None:

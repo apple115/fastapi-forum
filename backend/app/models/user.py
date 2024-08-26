@@ -29,7 +29,6 @@ class User(UserBase, table=True):
     继承自SQLModel，表明它是一个模型类，并且可以映射到数据库中的一个表。
 
     Attributes:
-        __tablename__ (str): 指定数据库中的表名。如果不设置，默认为类名的小写形式。
         __table_args__ (dict): 特殊表参数，这里设置'extend_existing': True，表示允许模型扩展已存在的表。
         id
         created_at (datetime): 用户创建时间，使用Field指定默认值为当前时间。

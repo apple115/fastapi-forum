@@ -8,7 +8,7 @@ interface NavbaritemsProps {
 }
 
 
-const Navbaritem:React.FC<NavbaritemsProps>=({title,params})=>{
+const Navbaritem:React.FC<NavbaritemsProps>=({title,params,onClick})=>{
   return (
     <div className="p-2 hover:bg-gray-200 rounded transition-colors duration-200">
       <Link href={`/?`} className="text-white-800 font-semibold">

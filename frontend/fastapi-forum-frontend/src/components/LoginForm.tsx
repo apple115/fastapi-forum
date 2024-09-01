@@ -1,68 +1,93 @@
 import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+
+const DOMAIN = "http://127.0.0.1:8000";
+//TODO nextauth
 
 const LoginForm: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [verificationCode, setVerificationCode] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    try {
+      const response = await fetch(`${DOMAIN}/api/v1/login/access-token`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: new URLSearchParams({
+          grant_type: "password",
+          username: username,
+          password: password,
+        }),
+      });
+      if (response.status === 200) {
+        // 登录成功的处理逻辑
+        console.log("登录成功");
+        onClose();
+      } else if (response.status === 401) {
+        // 登录失败的处理逻辑
+        console.error("用户名或密码错误");
+      } else {
+        console.error("未知错误");
+      }
+    } catch (error) {
+      console.error("网络错误或其他异常", error);
+    }
     //   onLogin(username, password, verificationCode);
   };
 
   return (
-    <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 p-8 bg-white shadow-md rounded-lg">
+    <Card className=" fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 mx-auto max-w-sm ">
       <span
-        className="absolute top-4 right-4 cursor-pointer text-2xl text-blue-500"
+        className="absolute top-4 right-4 cursor-pointer text-2xl "
         onClick={onClose}
       >
         ×
       </span>
-      <div className="modal-content">
-        <h2 className="text-lg font-semibold mb-4">登录</h2>
-        <form onSubmit={handleSubmit}>
-          <input
-            type="text"
-            placeholder="用户名"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            className="w-full mb-2 px-3 py-2 border rounded"
-          />
-          <input
-            type="password"
-            placeholder="密码"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="w-full mb-2 px-3 py-2 border rounded"
-          />
-          <input
-            type="text"
-            placeholder="验证码"
-            value={verificationCode}
-            onChange={(e) => setVerificationCode(e.target.value)}
-            className="w-full mb-2 px-3 py-2 border rounded"
-          />
-          <button
-            type="submit"
-            className="w-full bg-blue-500 text-white py-2 rounded"
-          >
-            登录
-          </button>
-          <div>
-            <a href="#" className="text-blue-500">
-              忘记密码
-            </a>
-            <span>
-              {" "}
-              没有账号？{" "}
-              <a href="#" className="text-blue-500">
-                注册
-              </a>
-            </span>
+      <CardHeader>
+        <CardTitle className="text-2xl">Login</CardTitle>
+        <CardDescription>
+          Enter your email below to login to your account
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div className="grid gap-4">
+          <div className="grid gap-2">
+            <Label htmlFor="email">Email</Label>
+            <Input
+              id="email"
+              type="email"
+              placeholder="m@example.com"
+              required
+            />
           </div>
-        </form>
-      </div>
-    </div>
+          <div className="grid gap-2">
+            <div className="flex items-center">
+              <Label htmlFor="password">Password</Label>
+              <Link href="#" className="ml-auto inline-block text-sm underline">
+                Forgot your password?
+              </Link>
+            </div>
+            <Input id="password" type="password" required />
+          </div>
+          <Button type="submit" className="w-full">
+            Login
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
   );
 };
 

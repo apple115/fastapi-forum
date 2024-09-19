@@ -1,6 +1,8 @@
 from datetime import datetime
 from sqlmodel import Field, SQLModel
+from pydantic import EmailStr
 import uuid
+
 
 class UserBase(SQLModel):
     """
@@ -11,40 +13,48 @@ class UserBase(SQLModel):
         - level: 1 表示 管理员。
         - level: 2 表示 普通论坛人员。
     """
-    email: str
-    name:  str|None =Field(default=None,max_length=255)
-    level: int=Field(default=2)
+
+    email: EmailStr = Field(unique=True, index=True, max_length=255)
+    name: str | None = Field(default=None, max_length=255)
+    level: int = Field(default=2)
+    is_active: bool = Field(default=True)
+
 
 class UserCreate(UserBase):
-    password:str =Field(max_length=255)
+    password: str = Field(min_length=8, max_length=255)
+
+
+class UserRegister(SQLModel):
+    email: EmailStr = Field(max_length=255)
+    password: str = Field(max_length=255)
+    check_password: str = Field(max_length=255)
+    name: str | None = Field(default=None, max_length=255)
+
 
 class UserUpdate(SQLModel):
-    email:str|None = Field(default=None,max_length=255)
-    password:str|None = Field(default=None,max_length=255)
-    level:int|None = Field(default=2)
+    email: EmailStr | None = Field(default=None, max_length=255)
+    password: str | None = Field(default=None, min_length=8, max_length=255)
+
+
+class UserUpdateLevel(SQLModel):
+    level: int | None = Field(default=2)
+
+
+class UserData(UserBase):
+    created_at: datetime
+    id: uuid.UUID
 
 class User(UserBase, table=True):
     """
     使用SQLModel定义的用户表模型。这个类表示数据库中的一个用户表，
     继承自SQLModel，表明它是一个模型类，并且可以映射到数据库中的一个表。
-
-    Attributes:
-        __table_args__ (dict): 特殊表参数，这里设置'extend_existing': True，表示允许模型扩展已存在的表。
-        id
-        created_at (datetime): 用户创建时间，使用Field指定默认值为当前时间。
-        password_hash (str): 用户的密码哈希值，用于存储加密后的密码。
     """
-    __table_args__ = {'extend_existing': True}  # 允许扩展已存在的表，而不是每次重新创建
-    id:uuid.UUID = Field(default_factory=uuid.uuid4,primary_key=True)
+
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     created_at: datetime = Field(default=datetime.now())
     password_hash: str
 
-class UserRegister(SQLModel):
-    name:str=Field(max_length=255)
-    email:str = Field(max_length=255)
-    password:str = Field(max_length=255)
-    check_password:str=Field(max_length=255)
 
-class UserData(UserBase):
-    id:uuid.UUID
-    created_at:datetime
+class UserPublic(UserBase):
+    id: uuid.UUID
+    created_at: datetime

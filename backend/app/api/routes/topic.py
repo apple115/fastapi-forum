@@ -1,114 +1,77 @@
+from mailbox import Message
 from fastapi import APIRouter, HTTPException
 from app.api.deps import SessionDep
-from app.models.topic import TopicCreate, TopicInput
+from app.models.topic import TopicCreate, TopicInput, Topic, TopicUpdate
 from app.crud import topic_crud
-from app.api.deps import CurrentUser,CurrentAdmin
+from app.api.deps import CurrentUser, CurrentAdmin
 from typing import Any
 import uuid
 
 router = APIRouter()
 """
 主题:
-- POST /topics: 创建主题 (TODO)
-- GET /topics: 获取所有主题 (TODO)
-- GET /topics/{topic_id}: 获得某个主题(TODO)
-- DELETE /topics/{topic_id}: 删除这个主题(TODO)
-- PUT /topics/{topic_id}: 更新某个主题的信息,需要全部信息(TODO)
-- PATCH /topics/{topic_id}: 更新某个主题的信息,需要部分信息(TODO)
+- POST /topic: 创建主题 (TODO)
+- GET /topic: 获取所有主题 (TODO)
+- GET /topic/{topic_id}: 获得某个主题(TODO)
+- DELETE /topic/{topic_id}: 删除这个主题(TODO)
+- PUT /topic/{topic_id}: 更新某个主题的信息,需要全部信息(TODO)
+- PATCH /topic/{topic_id}: 更新某个主题的信息,需要部分信息(TODO)
 """
 
-
-@router.get("/topics")
+@router.get("/topic", response_model=list[Topic])
 def get_all_topic(session: SessionDep):
-    try:
-        topics = topic_crud.get_all_topics(session=session)
-        if topics is None:
-            return {"message": "no topics"}
-        eniched_topics = []
-        for topic in topics:
-            topic_links = [
-                {"rel": "self", "href": f"/topics/{topic.id}", "methed": "GET"},
-                {"rel": "delete", "href": f"/topics/{topic.id}", "methed": "DELETE"},
-                {"rel": "put", "href": f"/topics/{topic.id}", "methed": "PUT"},
-                {"rel": "patch", "href": f"/topics/{topic.id}", "methed": "PATCH"},
-                {
-                    "rel": "get_users",
-                    "href": f"/users/{topic.creator_id}",
-                    "methed": "GET",
-                },
-            ]
-            enriched_topic = {
-                "id": topic.id,
-                "title": topic.title,
-                "description": topic.description,
-                "creator": topic.id,
-                "links": topic_links,
-            }
-            eniched_topics.append(enriched_topic)
-        return eniched_topics
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    topics = topic_crud.get_all_topics(session=session)
+    if topics is None:
+        raise HTTPException(status_code=404, detail="topics not found")
+    return topics
 
 
-@router.post("/topics")
-def create_topic(
-    session: SessionDep, topicData: TopicInput, current_user: CurrentUser
-) -> Any:
-    try:
-        topic_in = TopicCreate(
-            title=topicData.title,
-            description=topicData.description,
-            creator_id=current_user.id,
-        )
-        topic_crud.create_topic(session=session, topic_in=topic_in)
-        return {"message": "Create a new topic"}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+@router.post("/topic")
+def create_topic(session: SessionDep, topicData: TopicInput, current_user: CurrentUser):
+    topic_in = TopicCreate(
+        title=topicData.title,
+        description=topicData.description,
+        creator_id=current_user.id,
+    )
+    _ = topic_crud.create_topic(session=session, topic_in=topic_in)
+    return {"message": "Create a new topic"}
 
 
-@router.get("/topics/{topic_id}")
+@router.get("/topic/{topic_id}", response_model=Topic)
 def get_topic(session: SessionDep, topic_id: int):
-    try:
-        topic = topic_crud.get_topic_by_id(session=session, topic_id=topic_id)
-        if topic is None:
-            raise HTTPException(status_code=404, detail="topic not found")
-        topic_links = [
-            {"rel": "self", "href": f"/topics/{topic.id}", "methed": "GET"},
-            {"rel": "delete", "href": f"/topics/{topic.id}", "methed": "DELETE"},
-            {"rel": "put", "href": f"/topics/{topic.id}", "methed": "PUT"},
-            {"rel": "patch", "href": f"/topics/{topic.id}", "methed": "PATCH"},
-        ]
-        enriched_topic = {
-            "id": topic.id,
-            "title": topic.title,
-            "description": topic.description,
-            "creator": topic.id,
-            "links": topic_links,
-        }
-        return enriched_topic
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    topic = topic_crud.get_topic_by_id(session=session, topic_id=topic_id)
+    if topic is None:
+        raise HTTPException(status_code=404, detail="topic not found")
+    return topic
+
+@router.delete("/topic/{topic_id}")
+def delete_topic(session: SessionDep, topic_id: int, _current_admin: CurrentAdmin):
+    rv = topic_crud.delete_topic_by_id(session=session, topic_id=topic_id)
+    if rv is False:
+        raise HTTPException(status_code=404, detail="topic not found")
+    return {"message": "Delete a topic"}
 
 
-@router.delete("/topics/{topic_id}", include_in_schema=False)
-def delete_topic(session: SessionDep, topic_id: int, current_admin: CurrentAdmin):
-    try:
-        pass
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+@router.put("/topic/{topic_id}", include_in_schema=False)
+def put_topic(
+    session: SessionDep,
+    topic_id: int,
+    topic_update: TopicUpdate,
+    current_user: CurrentUser,
+):
+    create_id = topic_crud.get_create_id(session=session, topic_id=topic_id)
+    if create_id != current_user.id:
+        raise HTTPException(status_code=401, detail="topic not belong to you")
+    rv = topic_crud.update_topic_by_id(
+        session=session, topic_id=topic_id, topic_in=topic_update
+    )
+    if rv is False:
+        raise HTTPException(status_code=404, detail="topic not found")
+    return {"message": "Update a topic"}
 
-
-@router.put("/topics/{topic_id}", include_in_schema=False)
-def put_topic(session: SessionDep, topic_id: int, current_user: CurrentUser):
-    try:
-        pass
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-
-@router.patch("topics/{topic_id}", include_in_schema=False)
-def patch_topic(session: SessionDep, topic_id: int, current_user: CurrentUser):
-    try:
-        pass
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+# @router.patch("topics/{topic_id}", include_in_schema=False)
+# def patch_topic(session: SessionDep, topic_id: int, current_user: CurrentUser):
+#     try:
+#         pass
+#     except Exception as e:
+#         raise HTTPException(status_code=500, detail=str(e))

@@ -7,7 +7,7 @@ authors = ["apple115 <2567031030@qq.com>"]
 
 [tool.poetry.dependencies]
 python = "^3.12"
-redis = "^5.0.8"
+redis = {extras = ["hiredis"], version = "^5.0.8"}
 pytest = "^8.3.3"
 fastapi = {extras = ["standard"], version = "^0.114.1"}
 pydantic = "^2.9.1"
@@ -17,6 +17,11 @@ sqlmodel = "^0.0.22"
 python-jose = "^3.3.0"
 passlib = "^1.7.4"
 pymysql = "^1.1.1"
+
+[tool.peotry.dev-dependencies]  # or the poetry equivalent
+dev = [
+    "basedpyright", # you can pin the version here if you want, or just rely on the lockfile
+]
 
 [[tool.poetry.source]]
 name = "mirrors"

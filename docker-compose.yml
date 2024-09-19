@@ -1,0 +1,27 @@
+version: "3"
+
+services:
+  forum_mysql:
+        image: mysql
+        container_name: mysql
+        volumes:
+        - /data/fastapi-forum-docker-mysql:/var/lib/mysql
+        ports:
+        - 3306:3306
+        environment:
+            MYSQL_ROOT_PASSWORD: rootroot
+  forum_redis:
+        image: redis/redis-stack
+        container_name: redis
+        ports:
+        - 6379:6379
+        - 8001:8001
+  forum_fastapi:
+        build:
+            context: ./backend
+        ports:
+        - 8000:8000
+        depends_on:
+        - forum_redis
+        - forum_mysql
+        command: poetry run fastapi dev --host 0.0.0.0 /app/main.py

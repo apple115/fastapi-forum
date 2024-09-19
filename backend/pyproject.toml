@@ -17,6 +17,7 @@ sqlmodel = "^0.0.22"
 python-jose = "^3.3.0"
 passlib = "^1.7.4"
 pymysql = "^1.1.1"
+cryptography = "^43.0.1"
 
 [tool.peotry.dev-dependencies]  # or the poetry equivalent
 dev = [

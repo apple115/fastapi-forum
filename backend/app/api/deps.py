@@ -27,6 +27,7 @@ redis_client = redis.Redis(
     host=settings.REDIS_HOST, port=settings.REDIS_PORT, db=settings.REDIS_DB
 )
 
+
 def get_redis() -> redis.Redis:
     return redis_client
 
@@ -35,28 +36,30 @@ def get_db() -> Generator[Session, None, None]:
     with Session(engine) as session:
         yield session
 
+
 RedisDep = Annotated[redis.Redis, Depends(get_redis)]
 SessionDep = Annotated[Session, Depends(get_db)]
 TokenDep = Annotated[str, Depends(reusable_oauth2)]
 
+
 def get_current_user(session: SessionDep, token: TokenDep) -> User:
-    #logger.info(f"token: {token}")
     try:
-        payload = jwt.decode(
-            token, settings.SECRET_KEY, algorithms=[security.ALGORITHM]
-        )
+        logger.info(settings.SECRET_KEY)
+        payload = jwt.decode(f"{token}",settings.SECRET_KEY, algorithms='HS256')
+        logger.info(payload)
         token_data = TokenPayload(**payload)
     except (JWTError, ValidationError) as e:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail=str(e),
         )
-    user = session.get(User,uuid.UUID(token_data.sub))
+    user = session.get(User, uuid.UUID(token_data.sub))
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     return user
 
-def get_current_admin(session:SessionDep,token:TokenDep)->User:
+
+def get_current_admin(session: SessionDep, token: TokenDep) -> User:
     try:
         payload = jwt.decode(
             token, settings.SECRET_KEY, algorithms=[security.ALGORITHM]
@@ -68,14 +71,12 @@ def get_current_admin(session:SessionDep,token:TokenDep)->User:
             detail=str(e),
         )
     if token_data.level == 2:
-        raise HTTPException(
-            status_code=401,
-            detail="not is admin"
-        )
+        raise HTTPException(status_code=401, detail="not is admin")
     user = session.get(User, uuid.UUID(token_data.sub))
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     return user
 
+
 CurrentUser = Annotated[User, Depends(get_current_user)]
-CurrentAdmin = Annotated[User,Depends(get_current_admin)]
+CurrentAdmin = Annotated[User, Depends(get_current_admin)]

@@ -1,13 +1,12 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.core.config import settings
-from app.api.main import api_router
+from app.core.config import settings  # pyright: ignore[reportMissingTypeStubs]
+from app.api.main import api_router  # pyright: ignore[reportMissingTypeStubs]
 
 origins = [
     "http://127.0.0.1:3000",
 ]
-
 
 app = FastAPI(
     title=settings.PROJECT_NAME, openapi_url=f"{settings.API_V1_STR}/openapi.json"

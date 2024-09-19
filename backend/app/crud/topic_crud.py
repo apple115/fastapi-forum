@@ -1,6 +1,6 @@
 from sqlmodel import Session, select
 from collections.abc import Sequence
-from app.models.topic import Topic, TopicBase, TopicCreate, TopicUpdate
+from app.models.topic import Topic, TopicCreate, TopicUpdate
 import uuid
 
 
@@ -42,10 +42,7 @@ def update_topic_by_id(
     db_obj = session.exec(select(Topic).where(Topic.id == topic_id)).first()
     if db_obj is None:
         return False
-    if topic_in.title is not None:
-        db_obj.title = topic_in.title
-    if topic_in.description is not None:
-        db_obj.description = topic_in.description
+    db_obj = db_obj.model_validate(topic_in)
     session.add(db_obj)
     session.commit()
     session.refresh(db_obj)

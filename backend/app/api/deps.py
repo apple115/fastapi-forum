@@ -36,16 +36,14 @@ def get_db() -> Generator[Session, None, None]:
     with Session(engine) as session:
         yield session
 
-
 RedisDep = Annotated[redis.Redis, Depends(get_redis)]
 SessionDep = Annotated[Session, Depends(get_db)]
 TokenDep = Annotated[str, Depends(reusable_oauth2)]
 
-
 def get_current_user(session: SessionDep, token: TokenDep) -> User:
     try:
         logger.info(settings.SECRET_KEY)
-        payload = jwt.decode(f"{token}",settings.SECRET_KEY, algorithms='HS256')
+        payload = jwt.decode(f"{token}", settings.SECRET_KEY, algorithms="HS256")
         logger.info(payload)
         token_data = TokenPayload(**payload)
     except (JWTError, ValidationError) as e:

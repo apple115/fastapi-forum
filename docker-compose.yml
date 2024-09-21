@@ -19,9 +19,17 @@ services:
   forum_fastapi:
         build:
             context: ./backend
+        volumes:
+        # 挂载当前目录下的 ./backend/app 到容器中的 /app/app
+        - ./backend/app:/app/app
+        # 如果有脚本也需要热更新，挂载脚本目录
+        - ./backend/scripts:/app/scripts
+        # 挂载 Poetry 配置文件
+        - ./backend/pyproject.toml:/app/pyproject.toml
+        - ./backend/poetry.lock:/app/poetry.lock
         ports:
         - 8000:8000
         depends_on:
         - forum_redis
         - forum_mysql
-        command: poetry run fastapi dev --host 0.0.0.0 /app/main.py
+        command: poetry run fastapi dev --host 0.0.0.0 --reload /app/main.py

@@ -5,6 +5,7 @@ from app.models.topic import TopicCreate, TopicInput, Topic, TopicUpdate
 from app.crud import topic_crud
 from app.api.deps import CurrentUser, CurrentAdmin
 from redis.commands.json.path import Path
+from app.api.cache_helper import get_or_cache_item
 from typing import Any
 import uuid
 import json
@@ -34,6 +35,7 @@ def get_all_topic(
         raise HTTPException(status_code=404, detail="topics not found")
     return topics
 
+
 @router.post("/topic")
 def create_topic(session: SessionDep, topicData: TopicInput, current_user: CurrentUser):
     topic_in = TopicCreate(
@@ -44,20 +46,17 @@ def create_topic(session: SessionDep, topicData: TopicInput, current_user: Curre
     _ = topic_crud.create_topic(session=session, topic_in=topic_in)
     return {"message": "Create a new topic"}
 
+
 @router.get("/topic/{topic_id}", response_model=Topic)
 def get_topic(session: SessionDep, topic_id: int, redis_client: RedisDep):
-    topic = redis_client.json().get(str(topic_id), Path.root_path())
-    if topic:
-        logger.info("get topic from redis")
-        return topic
-    else:
-        topic = topic_crud.get_topic_by_id(session=session, topic_id=topic_id)
-        _ = redis_client.json().set(
-            str(topic_id), Path.root_path(), topic.model_json_schema()
-        )
-    if topic is None:
-        raise HTTPException(status_code=404, detail="topic not found")
-    return topic
+    return get_or_cache_item(
+        redis_client=redis_client,
+        session=session,
+        cache_key=str(topic_id),
+        db_lookup_func=topic_crud.get_topic_by_id,
+        db_lookup_func_args={"session": session, "topic_id": topic_id},
+    )
+
 
 
 @router.delete("/topic/{topic_id}")
